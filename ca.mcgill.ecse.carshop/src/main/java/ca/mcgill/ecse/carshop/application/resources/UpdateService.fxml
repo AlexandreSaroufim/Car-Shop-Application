@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ca.mcgill.ecse.carshop.application.Fxview">
+   <children>
+      <ComboBox layoutX="401.0" layoutY="109.0" prefWidth="150.0" promptText="Select Service" />
+      <Text layoutX="184.0" layoutY="63.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Update Service">
+         <font>
+            <Font name="Arial" size="34.0" />
+         </font>
+      </Text>
+      <TextField layoutX="396.0" layoutY="157.0" promptText="New Service Name" />
+      <TextField layoutX="396.0" layoutY="200.0" promptText="New Duration" />
+   </children>
+</AnchorPane>

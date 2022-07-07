@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ca.mcgill.ecse.carshop.view.Fxview">
+    <children>
+      <ImageView fitHeight="1034.0" fitWidth="741.0" layoutX="110.0" layoutY="-167.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@cal%205.jpg" />
+         </image>
+      </ImageView>
+        <AnchorPane prefHeight="600.0" prefWidth="200.0" style=" -fx-background-color: orange;">
+            <children>
+
+                <Hyperlink layoutX="8.0" layoutY="246.0" onAction="#updatebusinessinformation" prefHeight="28.0" prefWidth="195.0" text="Update Business information">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                </Hyperlink>
+                <Hyperlink layoutX="53.0" layoutY="319.0" onAction="#backtomenu" text="Back to menu">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                </Hyperlink>
+                <Text layoutX="42.0" layoutY="104.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Business Hours">
+                    <font>
+                        <Font name="System Bold" size="18.0" />
+                    </font>
+                </Text>
+                <Text layoutX="67.0" layoutY="70.0" strokeType="OUTSIDE" strokeWidth="0.0" text="carshop">
+                    <font>
+                        <Font name="System Bold" size="18.0" />
+                    </font>
+                </Text>
+            <Hyperlink layoutX="16.0" layoutY="213.0" onAction="#addbusinessinformationS" text="Add Business Information">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Hyperlink>
+            <Hyperlink layoutX="34.0" layoutY="287.0" onAction="#addbusinesshoursS" text="Add Business Hours">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Hyperlink>
+            </children></AnchorPane>
+        <Button layoutX="622.0" layoutY="413.0" mnemonicParsing="false" onAction="#doUpdateBusinessHours" text="Update" />
+        <Text layoutX="396.0" layoutY="88.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Update Business Hours" textAlignment="CENTER">
+            <font>
+                <Font size="24.0" />
+            </font>
+        </Text>
+      <Text layoutX="464.0" layoutY="199.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Day to update:" wrappingWidth="95.00000476837158">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Text>
+      <TextField fx:id="oldDay" layoutX="571.0" layoutY="181.0" prefHeight="25.0" prefWidth="101.0" promptText="ex: Monday" />
+      <TextField fx:id="oldStartTimeBusiness" layoutX="571.0" layoutY="225.0" prefHeight="25.0" prefWidth="101.0" promptText="ex: 9:00" />
+      <TextField fx:id="newDay" layoutX="571.0" layoutY="287.0" prefHeight="25.0" prefWidth="101.0" promptText="ex: Tuesday" />
+      <TextField fx:id="newEndTimeBusiness" layoutX="571.0" layoutY="367.0" prefHeight="25.0" prefWidth="101.0" promptText="ex: 16:00" />
+      <Text layoutX="467.0" layoutY="243.0" strokeType="OUTSIDE" strokeWidth="0.0" text="old Start Time:" wrappingWidth="100.99999904632568">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Text>
+      <Text layoutX="440.0" layoutY="305.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter The New Day:" wrappingWidth="127.6611328125">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Text>
+      <Text layoutX="368.0" layoutY="346.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter The New Day's Start Time:" wrappingWidth="202.99999713897705">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Text>
+      <Text layoutX="375.0" layoutY="385.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter The New Day's End Time:" wrappingWidth="195.00000476837158">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Text>
+      <TextField fx:id="newStartTimeBusiness" layoutX="571.0" layoutY="328.0" prefHeight="25.0" prefWidth="101.0" promptText="ex: 11:00" />
+      <Text layoutX="296.0" layoutY="572.0" strokeType="OUTSIDE" strokeWidth="0.0" text="*If closed on a specific day, enter &quot;00:00&quot; on both the Start and End Time." wrappingWidth="431.52618408203125">
+         <font>
+            <Font name="System Bold Italic" size="12.0" />
+         </font>
+      </Text>
+    </children>
+</Pane>

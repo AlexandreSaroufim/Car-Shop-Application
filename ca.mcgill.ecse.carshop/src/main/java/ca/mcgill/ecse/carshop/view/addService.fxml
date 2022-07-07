@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane onMouseEntered="#initScreenElements" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ca.mcgill.ecse.carshop.view.Fxview">
+   <children>
+      <ImageView fitHeight="600.0" fitWidth="610.0" layoutX="190.0" layoutY="-3.0">
+         <image>
+            <Image url="@service.jpg" />
+         </image>
+      </ImageView>
+      <TextField fx:id="servicename" layoutX="465.0" layoutY="221.0" promptText="Service Name" />
+      <TextField fx:id="duration" layoutX="465.0" layoutY="272.0" promptText="Duration" />
+      <ComboBox fx:id="cmb" layoutX="464.0" layoutY="320.0" prefWidth="150.0" promptText="Tech Type" />
+      <Button layoutX="560.0" layoutY="372.0" mnemonicParsing="false" onAction="#submitAddService" text="Submit" />
+      <Label fx:id="statuslabel" layoutX="193.0" layoutY="375.0" text=" " textFill="#e90000">
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font></Label>
+      <AnchorPane layoutY="-3.0" prefHeight="600.0" prefWidth="200.0" style="-fx-background-color: orange;">
+         <children>
+            <Text layoutX="48.0" layoutY="90.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Add Service">
+               <font>
+                  <Font name="Arial Bold" size="18.0" />
+               </font>
+            </Text>
+            <Text layoutX="70.0" layoutY="61.0" strokeType="OUTSIDE" strokeWidth="0.0" text="carshop" wrappingWidth="83.60001420974731">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Text>
+            <Hyperlink layoutX="30.0" layoutY="258.0" onAction="#returnToServiceOptions" text="Back to service menu">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Hyperlink>
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>

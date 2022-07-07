@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ca.mcgill.ecse.carshop.view.Fxview">
+   <children>
+      <AnchorPane prefHeight="600.0" prefWidth="200.0" style="-fx-background-color: orange;">
+         <children>
+            <Text layoutX="68.0" layoutY="52.0" strokeType="OUTSIDE" strokeWidth="0.0" text="carshop" wrappingWidth="64.58908081054688">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Text>
+            <Hyperlink layoutX="74.0" layoutY="253.0" onAction="#signout" text="sign out">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Hyperlink>
+         </children>
+      </AnchorPane>
+      <Text layoutX="400.0" layoutY="70.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome!">
+         <font>
+            <Font name="System Bold" size="45.0" />
+         </font>
+      </Text>
+      <Button layoutX="222.0" layoutY="209.0" mnemonicParsing="false" onAction="#updategaragea" prefHeight="169.0" prefWidth="244.0">
+         <graphic>
+            <ImageView fitHeight="190.0" fitWidth="260.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@tech3.jpg" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
+      <Button layoutX="222.0" layoutY="405.0" mnemonicParsing="false" onAction="#updategaragea" prefHeight="25.0" prefWidth="276.0" text="Update Garage hours" />
+      <Button layoutX="510.0" layoutY="209.0" mnemonicParsing="false" onAction="#accounta" prefHeight="181.0" prefWidth="276.0">
+         <graphic>
+            <ImageView fitHeight="174.0" fitWidth="243.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@account.jpg" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
+      <Button layoutX="514.0" layoutY="405.0" mnemonicParsing="false" onAction="#accounta" prefHeight="25.0" prefWidth="276.0" text="Account" />
+   </children>
+</Pane>

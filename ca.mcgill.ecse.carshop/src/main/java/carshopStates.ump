@@ -1,0 +1,592 @@
+external Time {}
+external Date {}
+external CarShopApplication {}
+external InvalidInputException {}
+external CarShopController {}
+external CarshopPersistence {}
+
+class Appointment {
+
+	depend java.sql.Time;
+	depend java.sql.Date;
+	depend ca.mcgill.ecse.carshop.application.CarShopApplication;
+	depend ca.mcgill.ecse.carshop.controller.InvalidInputException;
+	depend ca.mcgill.ecse.carshop.controller.CarShopController;
+	depend ca.mcgill.ecse.carshop.persistence.CarshopPersistence;
+	AppointmentStatus {
+    
+	   	Booked {
+		
+			modifyAppointmentInfo (String user, String newService, String newDate, String newTime,  String newOptSer, String newOptSerTime) [atleastDayBefore(stringToDate(CarShopApplication.getSystemDate()))]/ {
+	      		try {
+			updateAppointment(CarShopApplication.getCarShop(), this, user, newService, newDate, newTime, newOptSer, newOptSerTime);
+		} catch (InvalidInputException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	      		
+	      	} -> Booked;
+          modifyAppointmentInfo (String user, String newService, String newDate, String newTime,  String newOptSer, String newOptSerTime) [!atleastDayBefore(stringToDate(CarShopApplication.getSystemDate()))]/ {
+	      		rejectUpdateAppointment();
+	      		
+	      	} -> Booked; 
+	      	
+	      
+
+          doCancelAppointment (String loggedInUser, String userOfAppointment, String appointmentType,
+			String datePassed, String timePassed) [atleastDayBefore(this.getServiceBooking(0).getTimeSlot().getStartDate())] / {
+	     	 	cancelAppointment(loggedInUser, userOfAppointment, appointmentType, appointmentType, timePassed);
+	     	} -> Final;
+	      	cancelAppointment () [!atleastDayBefore(this.getServiceBooking(0).getTimeSlot().getStartDate())] / {
+	      		rejectCancelAppointment();
+	     	 } -> Booked;
+	      
+          
+          startAppointment [isAfterStartTime(stringToDate(CarShopApplication.getSystemDate()), StringToTime(CarShopApplication.getSystemDate()))]/{
+	    		startAppointment();
+	    	} -> InProgress;
+	    	
+	    	startAppointment [!isAfterStartTime(stringToDate(CarShopApplication.getSystemDate()), StringToTime(CarShopApplication.getSystemDate()))]/{
+	    		rejectStartAppointment();
+	    	} -> Booked;
+
+	      
+	      	noShow (Customer customer) [stringToDate(CarShopApplication.getSystemDate()).equals(this.getStartTime()) ||	isAfterStartTime( stringToDate(CarShopApplication.getSystemDate()), StringToTime(CarShopApplication.getSystemDate()))] / {
+	      		addNoShow(this.getCustomer());
+	      		removeAppointment();
+	      	} -> Final;
+	      	noShow (Customer customer) [!isAfterStartTime(stringToDate(CarShopApplication.getSystemDate()), StringToTime(CarShopApplication.getSystemDate()))] / {
+	      		rejectNoShow();
+	      	} -> Booked;
+	      	
+	    }
+	    
+	    InProgress {
+	    
+	    	endAppointment() [StringToTime(CarShopApplication.getSystemDate()).equals(this.getEndTime()) || StringToTime(CarShopApplication.getSystemDate()).after(this.getEndTime())]/ {
+	    		removeAppointment();
+	    	}->Final;
+	    	endAppointment() [! StringToTime(CarShopApplication.getSystemDate()).equals(this.getEndTime()) || ! StringToTime(CarShopApplication.getSystemDate()).after(this.getEndTime())]/ {
+	    		rejectEndAppointment();
+	    	}->InProgress;
+	    	
+	       
+          
+          modifyAppointmentInfo (String user, String newService, String newDate, String newTime,  String newOptSer, String newOptSerTime) [newService == null && newDate==null && newTime==null] /{
+	      		try {
+			updateAppointment(CarShopApplication.getCarShop(), this, user, newService, newDate, newTime, newOptSer, newOptSerTime);
+		} catch (InvalidInputException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	        } -> InProgress;
+	        modifyAppointmentInfo (String user, String newService, String newDate, String newTime,  String newOptSer, String newOptSerTime) [newService != null || newDate!=null || newTime !=null] /{
+	      		rejectUpdateAppointment();
+	        } -> InProgress;
+	        
+	        startAppointment(Date systemDate, Time systemTime) /{
+	    		rejectStartAppointment();
+	    	} -> InProgress;
+	    	
+	    	noShow(Customer customer) /{
+	    		rejectNoShow();
+	    	} -> Booked;
+          
+	    }
+	    	
+	    	
+	    	
+	    	
+	       
+	    }
+	    
+	    
+	  
+
+	
+  // line 102 "../../../../../carshopStates.ump"
+   private void rejectNoShow(){
+    throw new RuntimeException("Cannot add a no show");
+  }
+
+  // line 106 "../../../../../carshopStates.ump"
+   private void rejectStartAppointment(){
+    throw new RuntimeException("Not yet time for appointment");
+  }
+
+  // line 112 "../../../../../carshopStates.ump"
+   private void rejectEndAppointment(){
+    throw new RuntimeException("Cannot end an appointment in progress");
+  }
+
+  // line 117 "../../../../../carshopStates.ump"
+   private void rejectCancelAppointment(){
+    throw new RuntimeException("Cannot cancel an appointment on the appointment date");
+  }
+
+  // line 121 "../../../../../carshopStates.ump"
+   private void rejectUpdateAppointment(){
+    throw new RuntimeException("Cannot change appointment date and time on the appointment date");
+  }
+
+  // line 126 "../../../../../carshopStates.ump"
+   // line 109 "../../../../../carshopStates.ump"
+   public static  void updateAppointment(CarShop carshop, Appointment a, String user, String newService, String newDate, String newTime, String newOptSer, String newOptSerTime) throws InvalidInputException{
+	   if(!user.equals("owner") && Customer.getWithUsername(user)==null) {
+			
+	   }		
+		
+		if(a.getAppointmentStatusFullName().equals("Booked")) {
+			
+			Date today = stringToDate(CarShopApplication.getSystemDate());
+			
+			
+			//we are on the day before
+			if(a.getServiceBooking(0).getTimeSlot().getStartDate().after(today)) {
+				if(newDate!=null) updateDate(a, newDate, newTime);
+				if(newTime!=null) updateTime(a, newTime, newDate);
+				if(newService!=null) updateService(carshop, a, newService);
+				if(newOptSer!=null) updateServices(a, newOptSer, newOptSerTime);
+				if(newOptSer==null && newOptSerTime!=null) updateOptSerTime(a,newOptSerTime);
+			}			
+			
+			else {
+				
+				
+			}
+		}
+		
+		if(user.equals("owner")) {
+			
+		}
+  }
+
+  private static void updateOptSerTime(Appointment a, String newOptSerTime) {
+	Time t = StringToTime(newOptSerTime);
+	a.getServiceBooking(a.getServiceBookings().size()-1).getTimeSlot().setStartTime(t);
+	a.getServiceBooking(a.getServiceBookings().size()-1).getTimeSlot().setEndTime(new Time(t.getTime()+(((Service) a.getServiceBooking(1).getService()).getDuration()*60*1000)));
+	
+}
+
+// line 138 "../../../../../carshopStates.ump"
+   private static  void updateServices(Appointment a, String newOptSer, String newOptSerTime) throws InvalidInputException{
+
+	    // TODO Auto-generated method stub
+		   String[] services = newOptSer.split(",");
+		   String[] times= newOptSerTime.split(",");
+		   for(int i = 0; i<services.length;i++) {
+			 //  a.getServiceBooking(i+1).setService((Service) Service.getWithName(newOptSer));
+			   Service s = (Service) Service.getWithName(services[i]);
+			   Date d = a.getServiceBooking(0).getTimeSlot().getStartDate();
+			   Time start = CarShopController.StringToTime(times[i]);
+			   //Time end = new Time(t[0].getTime() + (ser.getDuration() * 60 * 1000));
+			   Time end = new Time(start.getTime() + s.getDuration()* 60 * 1000);
+			   TimeSlot ts = new TimeSlot(d, start, d, end, CarShopApplication.getCarShop());
+			   
+			  
+			   if(!isOverlapping(ts, a)) {
+				   
+				ServiceBooking sb = new ServiceBooking(s, ts, a);			
+				ts.setEndTime(new Time(ts.getStartTime().getTime() +(sb.getService().getDuration()*60*1000)));
+			   }
+			   else {
+				   throw new InvalidInputException("Cannot add these optional services");
+
+			   }
+			   
+			   
+			   }
+		   
+	  }
+	   
+
+	   private static boolean isOverlapping(TimeSlot ts, Appointment a) {
+		   for(ServiceBooking sb: a.getServiceBookings()) {
+			   if(ts.getStartTime().after(sb.getTimeSlot().getStartTime()) && ts.getStartTime().before(sb.getTimeSlot().getEndTime())) {
+				   return true;
+			   }
+			   if(ts.getEndTime().after(sb.getTimeSlot().getStartTime()) && ts.getEndTime().before(sb.getTimeSlot().getEndTime())) {
+				   return true;
+			   }
+			  
+		   }
+		   return false;
+
+	   }
+
+
+	   
+  // line 143 "../../../../../carshopStates.ump"
+	   private static  void updateTime(Appointment a, String newTime, String newDate){
+    //only use this method when there is only one service
+		   boolean stillUpdate = true;
+		   Time t = StringToTime(newTime);
+		   if(newDate!=null) {
+			   Date d = stringToDate(newDate);
+			   
+			// cannot be during a holiday
+				List<TimeSlot> holidays = CarShopApplication.getCarShop().getBusiness().getHolidays();
+				for (TimeSlot h : holidays) {
+					//for (Time time : t) {
+						if ((d.after(h.getStartDate()) && d.before(h.getEndDate()))
+						|| (!d.before(h.getStartDate()) && !d.after(h.getStartDate()) && t.after(h.getStartTime()))
+						|| (!d.before(h.getEndDate()) && !d.after(h.getEndDate()) && t.before(h.getEndTime()))) {
+							stillUpdate = false;
+						}
+					//}
+				}
+				
+				//CHECK VACATION
+				for(TimeSlot v: a.getCarShop().getBusiness().getVacations()) {
+					if ((d.after(v.getStartDate()) && d.before(v.getEndDate()))
+					|| (!d.before(v.getStartDate()) && !d.after(v.getStartDate()) && t.after(v.getStartTime()))
+					|| (!d.before(v.getEndDate()) && !d.after(v.getEndDate()) && t.before(v.getEndTime()))) {
+						stillUpdate = false;
+					}
+				}
+		   }
+		   /*List<BusinessHour> hours = a.getCarShop().getBusiness().getBusinessHours();
+		   Time[] tArr= new Time[1];
+		   tArr[0] = CarShopController.StringToTime(newTime);//a.getServiceBooking(0).getTimeSlot().getStartTime();
+		   Calendar c = Calendar.getInstance();
+		   c.setTime(a.getServiceBooking(0).getTimeSlot().getStartDate());
+		   stillUpdate = CarShopController.checkIfInHours(hours, tArr, c);*/
+		   if(stillUpdate) {
+			   
+			   ServiceBooking sb  =a.getServiceBooking(0);
+			   TimeSlot ts = sb.getTimeSlot();
+			   ts.setStartTime(t);
+			   ts.setEndTime(new Time(t.getTime() + (sb.getService().getDuration() * 60 * 1000)));
+	   
+		   }
+	   }
+	   
+  // line 152 "../../../../../carshopStates.ump"
+   private static  void updateDate(Appointment a, String newDate, String newTime){
+    Date d = stringToDate(newDate);
+    boolean update = true;
+    
+    
+ // cannot be during a holiday
+    if(newTime!=null) {
+		List<TimeSlot> holidays = CarShopApplication.getCarShop().getBusiness().getHolidays();
+	    Time time = StringToTime(newTime);
+		for (TimeSlot h : holidays) {
+			//for (Time time : t) {
+				if ((d.after(h.getStartDate()) && d.before(h.getEndDate()))
+				|| (!d.before(h.getStartDate()) && !d.after(h.getStartDate()) && (time.equals(h.getStartTime())||time.after(h.getStartTime())))
+				|| (!d.before(h.getEndDate()) && !d.after(h.getEndDate()) && time.before(h.getEndTime()))) {
+					update = false;
+				}
+			//}
+		}
+		
+		//CHECK VACATION
+		for(TimeSlot v: a.getCarShop().getBusiness().getVacations()) {
+			if ((d.after(v.getStartDate()) && d.before(v.getEndDate()))
+			|| (!d.before(v.getStartDate()) && !d.after(v.getStartDate()) && time.after(v.getStartTime()))
+			|| (!d.before(v.getEndDate()) && !d.after(v.getEndDate()) && time.before(v.getEndTime()))) {
+				update = false;
+			}
+		}
+    }
+    if(update) {
+		for(ServiceBooking sb : a.getServiceBookings()) {
+			TimeSlot ts = sb.getTimeSlot();
+			ts.setStartDate(d);
+			ts.setEndDate(d);			
+		}
+    }
+  }
+
+  // line 162 "../../../../../carshopStates.ump"
+   private static  void updateService(CarShop carshop, Appointment appointment, String newService){
+    // TODO Auto-generated method stub
+	if(BookableService.getWithName(newService) instanceof Service) {
+		//check time
+		List<BusinessHour> hours = appointment.getCarShop().getGarage(0).getBusinessHours();
+		Time[] tArr= new Time[1];
+		tArr[0] = new Time(appointment.getStartTime().getTime()+(((Service) BookableService.getWithName(newService)).getDuration()*60*1000));
+		Calendar c = Calendar.getInstance();
+		Date d = appointment.getServiceBooking(0).getTimeSlot().getStartDate();
+		c.setTime(d);
+		boolean stillUpdate = CarShopController.checkIfInHours(hours, tArr, c);
+		
+		if(stillUpdate) stillUpdate = !isOverlapping(new TimeSlot(d, appointment.getStartTime(), d, appointment.getEndTime(), carshop), appointment);
+		
+		if(stillUpdate) {
+			
+			
+			appointment.setBookableService(BookableService.getWithName(newService));
+			appointment.getServiceBooking(0).setService((Service) Service.getWithName(newService));
+			ServiceBooking sb = appointment.getServiceBooking(0);
+			TimeSlot ts = sb.getTimeSlot();
+			ts.setEndTime(new Time(ts.getStartTime().getTime() +(sb.getService().getDuration()*60*1000)));
+		}
+		//do we need to edit the list of service bookings or is that automatic
+	}
+  }
+
+
+  // line 187 "../../../../../carshopStates.ump"
+   public static  Date stringToDate(String string){
+    String datee = "";
+
+		for (int i = 0; i < 10; i++) {
+			datee += string.charAt(i);
+		}
+
+		Date date = Date.valueOf(datee);
+		return date;
+  }
+
+  // line 198 "../../../../../carshopStates.ump"
+   private void addNoShow(Customer customer){
+    Integer noShows = customer.getNoShows();
+		noShows++;
+		customer.setNoShows(noShows);
+  }
+
+  // line 208 "../../../../../carshopStates.ump"
+   public Time getStartTime(){
+    List<ServiceBooking> serviceBookings=this.getServiceBookings();
+	
+	if(serviceBookings.size()!=0) {
+		String startTime = serviceBookings.get(0).getTimeSlot().getStartTime().toString();
+	
+		
+		//	startTime.toString()
+	   for(int i=1; i<serviceBookings.size();i++) {
+			if(startTime.compareTo(serviceBookings.get(i).getTimeSlot().getStartTime().toString())>0) {
+				startTime = serviceBookings.get(i).getTimeSlot().getStartTime().toString();
+			}
+		}
+	   return StringToTime(startTime);
+	}
+	else return null;
+  }
+
+  // line 228 "../../../../../carshopStates.ump"
+   public Time getEndTime(){
+    List<ServiceBooking> serviceBookings=this.getServiceBookings();
+	
+	if(serviceBookings.size()!=0) {
+		String endTime = serviceBookings.get(0).getTimeSlot().getEndTime().toString();
+	
+		
+		//	startTime.toString()
+	   for(int i=1; i<serviceBookings.size();i++) {
+			if(endTime.compareTo(serviceBookings.get(i).getTimeSlot().getEndTime().toString())<0) {
+				endTime = serviceBookings.get(i).getTimeSlot().getStartTime().toString();
+			}
+		}
+	   return StringToTime(endTime);
+	}
+	else return null;
+  }
+
+  // line 247 "../../../../../carshopStates.ump"
+   private static  Time StringToTime(String string){
+    if (string.length() < 11) {
+			if (string.length() == 4) {
+				string = "0" + string;
+			}
+			String hours = "";
+			String minutes = "";
+			hours += string.charAt(0);
+			hours += string.charAt(1);
+			minutes += string.charAt(3);
+			minutes += string.charAt(4);
+
+			@SuppressWarnings("deprecation")
+			Time time = new Time(Integer.parseInt(hours), Integer.parseInt(minutes), 0);
+
+			return time;
+		} else {
+			String s = string.substring(11);
+			return Time.valueOf(s + ":00");
+		}
+  }
+
+
+  /**
+   * line 112 "../../../../../carshopStates.ump"
+   */
+  // line 272 "../../../../../carshopStates.ump"
+   private boolean isAfterStartTime(Date systemDate, Time systemTime){
+    if(systemDate.equals(this.getServiceBooking(0).getTimeSlot().getStartDate()) && !systemTime.before(this.getStartTime())){
+			return true;
+		}
+		else{
+		 	return false;
+		}
+  }
+
+
+  /**
+   * line 121 "../../../../../carshopStates.ump"
+   */
+  // line 282 "../../../../../carshopStates.ump"
+   private boolean atleastDayBefore(Date systemDate){
+    if(systemDate.before(this.getServiceBooking(0).getTimeSlot().getStartDate())){
+			return true;
+		}
+		else{
+		 	return false;
+		}
+  }
+
+  // line 291 "../../../../../carshopStates.ump"
+   private void startAppointment(){
+    CarShopApplication.setCurAppointment(this);
+  }
+
+  // line 295 "../../../../../carshopStates.ump"
+   private void removeAppointment(){
+    this.delete();
+  }
+  
+  
+public static void RegisterNoShow(String string) throws Exception {
+
+ 	Time TimeAttempt = GetStartTimeOfWeirdFormat(string);
+	Date dateAttempt = CarShopController.stringToDate(string);
+
+		for (Appointment app: CarShopApplication.getCarShop().getAppointments()) {
+			
+			if (app.getServiceBooking(0).getTimeSlot().getStartDate().equals(dateAttempt) && !app.getAppointmentStatusFullName().equals("InProgress")) {
+				
+				if (app.getServiceBooking(0).getTimeSlot().getEndTime().before(TimeAttempt)) {
+					app.getCustomer().setNoShows(app.getCustomer().getNoShows()+1);
+					app.delete();
+				}
+
+			}
+			
+		}
+
+	}
+	 
+	public static Time GetStartTimeOfWeirdFormat(String string) {
+		
+		String hours = "";
+		String minutes = "";
+		hours += string.charAt(11);
+		hours += string.charAt(12);
+		minutes += string.charAt(14);
+		minutes += string.charAt(15);
+
+		@SuppressWarnings("deprecation")
+		Time time = new java.sql.Time(Integer.parseInt(hours), Integer.parseInt(minutes), 0);
+
+		return time;
+		
+	}
+
+	public static void endAppointment(String date) {
+		// TODO Auto-generated method stub
+		CarShopApplication.setSystemDate(date);
+		CarShopApplication.getCarShop().getAppointments().get(CarShopApplication.getCarShop().getAppointments().size()-1).endAppointment();	
+	}
+	
+	//Simo Benkirane
+	public static void endAppointment(CarShop carshop, Appointment a) throws Exception {
+				
+			if(a == null) {
+				throw new Exception("Appointment can't be null");
+			}
+				
+			if(!carshop.getAppointments().contains(a)) {
+				throw new Exception("Appointment doesn't exist");
+			}
+				
+			if(!(CarShopApplication.getCurrentUser() instanceof Owner)) {
+				throw new Exception("Not authorized for this action");
+			}
+				
+			a.endAppointment();
+			}
+
+	
+	//tada
+	public static void startAppointment(String date,String user) throws InvalidInputException {
+	
+	
+		if (date == null)
+			throw new InvalidInputException("Date cannot be null");
+
+		if (!(user.equals("owner"))) {
+			throw new InvalidInputException("Not authorized for this action");
+		}
+
+		CarShopApplication.setSystemDate(date);
+		CarShop carShop = CarShopApplication.getCarShop();
+		Appointment appointment = carShop.getAppointment(carShop.getAppointments().size() - 1);
+
+		if (appointment != null) {
+			System.out.println("DATE: " + stringToDate(date) + "     " + StringToTime(date));
+			appointment.startAppointment(stringToDate(date), StringToTime(date));
+		}
+
+		try {
+			CarshopPersistence.save(carShop);
+		} catch (RuntimeException e) {
+			throw new InvalidInputException(e.getMessage());
+		}	
+	}
+	
+	
+	public static void cancelAppointment(String loggedInUser, String userOfAppointment, String appointmentType,
+			String datePassed, String timePassed) throws InvalidInputException {
+
+		// must be correct user
+		if (!loggedInUser.equals(userOfAppointment)) {
+			User loggedIn = User.getWithUsername(loggedInUser);
+			if (loggedIn instanceof Customer)
+				throw new InvalidInputException("A customer can only cancel their own appointments");
+			else if (loggedIn instanceof Technician)
+				throw new InvalidInputException("A technician cannot cancel an appointment");
+			else if (loggedIn instanceof Owner)
+				throw new InvalidInputException("An owner cannot cancel an appointment");
+		}
+
+		// cannot cancel on same day
+		Date today = stringToDate(CarShopApplication.getSystemDate());
+		Date date = stringToDate(datePassed);
+		if (!date.before(today) && !date.after(today))
+			throw new InvalidInputException("Cannot cancel an appointment on the appointment date");
+
+		List<Appointment> arr = CarShopApplication.getCarShop().getAppointments();
+		for (Appointment a : arr) {
+			if (a.getCustomer().getUsername().equals(userOfAppointment) && a.getBookableService().getName().equals(appointmentType)) {
+
+				a.delete();
+				break;
+			}
+
+		}
+
+		List<List<Object>> l =  CarShopApplication.getBookingTimes() ;
+
+
+
+		for(int i=0; i<CarShopApplication.getBookingTimes().size();i++) {
+			if(l.get(i).get(0).toString().equals(datePassed) 
+					&& l.get(i).get(1).toString().equals(timePassed) &&
+					l.get(i).get(4).toString().equals(userOfAppointment)) {
+				l.remove(i);
+			}
+		}
+
+		try {
+			CarshopPersistence.save(CarShopApplication.getCarShop());
+		}
+		catch(RuntimeException e) {
+			throw new InvalidInputException(e.getMessage());
+		}
+
+	}
+	
+  
+
+}

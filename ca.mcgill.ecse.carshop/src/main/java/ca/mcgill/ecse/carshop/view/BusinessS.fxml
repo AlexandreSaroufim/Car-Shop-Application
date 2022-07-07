@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ca.mcgill.ecse.carshop.view.Fxview">
+    <children>
+      <ImageView fitHeight="680.0" fitWidth="1179.0" layoutX="-72.0" layoutY="-75.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@business%20info%20(2).jpg" />
+         </image>
+      </ImageView>
+        <Text layoutX="346.0" layoutY="190.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name:" wrappingWidth="54.2568359375">
+            <font>
+                <Font size="14.0" />
+            </font>
+        </Text>
+        <TextField fx:id="BusinessName" layoutX="419.0" layoutY="172.0" prefHeight="26.0" prefWidth="269.0" promptText="ex: MyCarShop" />
+        <Text layoutX="346.0" layoutY="260.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Address: " wrappingWidth="54.2568359375">
+            <font>
+                <Font size="14.0" />
+            </font>
+        </Text>
+        <TextField fx:id="BusinessAddress" layoutX="419.0" layoutY="238.0" prefHeight="26.0" prefWidth="269.0" promptText="ex: 221B Baker Street" />
+        <Text layoutX="344.0" layoutY="323.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Phone Number:" wrappingWidth="54.2568359375">
+            <font>
+                <Font size="14.0" />
+            </font>
+        </Text>
+        <TextField fx:id="BusinessPhoneNumber" layoutX="417.0" layoutY="314.0" prefHeight="26.0" prefWidth="269.0" promptText="ex: 604198762" />
+        <Text layoutX="344.0" layoutY="407.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Email:" wrappingWidth="54.2568359375">
+            <font>
+                <Font size="14.0" />
+            </font>
+        </Text>
+        <TextField fx:id="BusinessEmail" layoutX="417.0" layoutY="389.0" prefHeight="26.0" prefWidth="269.0" promptText="ex: MyCarShop@gmail.com" />
+        <Text layoutX="435.0" layoutY="64.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Add Business Information" textAlignment="CENTER" wrappingWidth="178.0">
+            <font>
+                <Font size="28.0" />
+            </font>
+        </Text>
+        <AnchorPane prefHeight="600.0" prefWidth="200.0" style="-fx-background-color: orange;">
+            <children>
+
+                <Hyperlink layoutX="7.0" layoutY="221.0" onAction="#updatebusinessinformation" text="Update Business Information">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                </Hyperlink>
+                <Hyperlink layoutX="54.0" layoutY="310.0" onAction="#backtomenu" text="Back to menu">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                </Hyperlink>
+                <Text layoutX="10.0" layoutY="85.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Business Information" wrappingWidth="188.0000114440918">
+                    <font>
+                        <Font name="System Bold" size="18.0" />
+                    </font>
+                </Text>
+                <Text layoutX="67.0" layoutY="61.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Carshop">
+                    <font>
+                        <Font name="System Bold" size="18.0" />
+                    </font>
+                </Text>
+            <Hyperlink layoutX="35.0" layoutY="249.0" onAction="#addbusinesshoursS" text="Add Business hours">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Hyperlink>
+            <Hyperlink layoutX="27.0" layoutY="277.0" onAction="#updatebusinesshourss" text="Update Business hours">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Hyperlink>
+            </children></AnchorPane>
+        <Button layoutX="634.0" layoutY="434.0" mnemonicParsing="false" onAction="#doAddBusinessInformation" text="Submit" />
+    </children>
+</Pane>
